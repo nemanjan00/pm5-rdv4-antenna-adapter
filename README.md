@@ -19,8 +19,15 @@ equivalents); on the PM5 silkscreen the drive pin is labelled `DRV`.
 > not assume the RDV4 order matches the PM5 when wiring an adapter.
 
 On the RDV4, viewed **top-down**, the **left** antenna connection is **HF** and
-the **right** is **LF**. Reading left-to-right, the **LF** pins are
-`PWR` → `RAW` → `GND` (i.e. reversed relative to the PM5's `GND` → `RAW` → `DRV`).
+the **right** is **LF**. Reading left-to-right:
+
+| Band       | Left → right           |
+| ---------- | ---------------------- |
+| HF (left)  | `GND` → `RAW` → `PWR`   |
+| LF (right) | `PWR` → `RAW` → `GND`   |
+
+So the two RDV4 bands are mirrored, and the LF order is reversed relative to the
+PM5's `GND` → `RAW` → `DRV`.
 
 ### RDV4 antenna interface
 
