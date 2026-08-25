@@ -53,9 +53,36 @@ The RDV4 antenna has two on-board physical switches for the LF tank:
 - **Q factor switch** — selects Q ≈ **14** or **7** (high/low damping).
 - **LF frequency switch** — selects **125 kHz** or **134 kHz**.
 
-These are set on the antenna itself (the PM5 does the equivalent over I2C on its
-own antenna — see the antenna controller manual). When driving an RDV4 antenna
-from a PM5, tuning/Q is chosen here, on the antenna, not via I2C.
+These are set on the antenna itself. When driving an RDV4 antenna from a PM5,
+tuning/Q is chosen **here, on the antenna** — the PM5 has no way to change them
+in software, because there is no antenna controller in this path.
+
+#### PM5 antenna — switching is done in software (I2C)
+
+Where the RDV4 antenna uses physical switches, the **PM5's own antenna does the
+equivalent over I2C** via its on-board antenna controller (I2C slave `0x51`). No
+jumpers — the host writes a register. Per
+`proxmark3/doc/md/PM5_Controllers/PM5_ANT_Controller_RM.md`, the IO mapping
+register `0x02` selects frequency and Q:
+
+| Bit | Function        | Notes                                             |
+| :-: | --------------- | ------------------------------------------------- |
+| 7   | 125 kHz enable  | LF frequency…                                     |
+| 6   | 134 kHz enable  | …at most one freq bit set; low→high priority;     |
+| 5   | 250 kHz enable  | all-zero falls back to 125 kHz                    |
+| 4   | 375 kHz enable  |                                                   |
+| 3   | 500 kHz enable  |                                                   |
+| 2   | HF LED          | 1 = on                                            |
+| 1   | LF LED          | 1 = on                                            |
+| 0   | Q value         | 1 = high Q / 0 = low Q — high Q only at 125/134 kHz |
+
+So the PM5 antenna adds **more LF frequencies** (125/134/250/375/500 kHz) and
+two blue LEDs beyond what the RDV4's two physical switches offer. Power-on
+default is 125 kHz + low Q + LEDs off (`0x02` = `0x80`).
+
+> This applies to the **PM5's own** antenna. An **RDV4** antenna on a PM5 has no
+> controller — you get whatever its physical Q/frequency switches are set to, and
+> the emulator (if fitted) only satisfies the ID/LED side, not real tuning.
 
 ### PM5 (ICX301) antenna interface
 
