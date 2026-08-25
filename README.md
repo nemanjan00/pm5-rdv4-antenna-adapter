@@ -19,25 +19,22 @@ one for the HF antenna and one for the LF antenna — each with the same signals
 On the RDV4 the pins are labelled `GND` / `LF_RAW` / `LF_PWR` (and the `HF_*`
 equivalents); on the PM5 silkscreen the drive pin is labelled `DRV`.
 
-> **⚠️ Wire by function, and buzz the PM5 board before trusting any spatial
-> order.** The two boards use the same three signals (`GND` / `RAW` / `PWR`≡`DRV`)
-> but their physical pad ordering is **not** assumed to match. The RDV4 order
-> below is observed; the **PM5 spatial order is UNVERIFIED** — earlier top/bottom
-> viewpoint flips in this document's history make any left-right claim suspect
-> until confirmed with a continuity check on the actual board. Match
-> **signal-to-signal** (`DRV`→`PWR`, `RAW`→`RAW`, `GND`→`GND`); never wire
-> straight-through by position.
+Both boards use the same three signals (`GND` / `RAW` / `PWR`≡`DRV`). Both are
+**mirror-symmetric** about the board centre — `GND` outermost, `PWR`/`DRV`
+innermost — so each board's two bands read in opposite order. The bands are
+**swapped side-to-side** between the boards: RDV4 has **HF on the left**, PM5 has
+**LF on the left**.
 
-On the RDV4, viewed **top-down**, the **left** antenna connection is **HF** and
-the **right** is **LF**. Reading left-to-right:
+Top-down, reading left-to-right:
 
-| Band       | Left → right           |
-| ---------- | ---------------------- |
-| HF (left)  | `GND` → `RAW` → `PWR`   |
-| LF (right) | `PWR` → `RAW` → `GND`   |
+| Board | Left band              | Right band             |
+| ----- | ---------------------- | ---------------------- |
+| RDV4  | **HF:** `GND`→`RAW`→`PWR` | **LF:** `PWR`→`RAW`→`GND` |
+| PM5   | **LF:** `GND`→`RAW`→`DRV` | **HF:** `DRV`→`RAW`→`GND` |
 
-So the two RDV4 bands are mirrored relative to each other. (This is the RDV4's
-own layout; it makes no claim about the PM5 — see the warning above.)
+Because of the mirror **and** the band swap, physical position never lines up —
+always wire **signal-to-signal** (`DRV`→`PWR`, `RAW`→`RAW`, `GND`→`GND`), per
+band, never straight-through by position.
 
 ### RDV4 antenna interface
 
@@ -68,10 +65,8 @@ and the antenna carries the **female** connector that those pins mate into.
 #### Extra connector on the PM5 antenna
 
 Unlike the RDV4 antenna, the PM5 antenna also carries a **10-pin (2x5) 2.54 mm**
-header, with the **male pins on the antenna** side. It sits to one side of the
-ICX301 connectors, past both bands. (The exact left/right side depends on
-viewing orientation — see the unverified-layout warning above; confirm against
-the board.)
+header, with the **male pins on the antenna** side. Viewed from the **top**, it
+sits on the **far left**, beyond the LF connector (LF left, HF right).
 
 This mates with the PM5 **main board 10P Connect header** — a general-purpose
 breakout, not antenna-specific. On the shipped antenna the antenna controller
@@ -80,10 +75,9 @@ the pins are unused by the antenna.
 
 **Pinout** — reproduced **verbatim from the proxmark3 docs** in their own stated
 orientation: *directly viewing the 10P connector with the machine's decorative
-side facing up, ICX301 connectors on the right.* This is a **different reference
-frame** from the top-down antenna convention used elsewhere in this document, and
-the two have **not** been reconciled — do not assume this row order maps onto the
-"LF left / HF right" framing above without checking the board.
+side facing up, ICX301 connectors on the right.* Note this is the docs' own frame
+for the **mainboard** header and differs from the top-down antenna convention
+used elsewhere here, so read the pad positions in that stated orientation.
 
 ```
  UART_TX   UART_RX   I2C_SDA   SWDIO   SWCLK
@@ -104,18 +98,20 @@ Source: `proxmark3/doc/md/Development/PM5_VERE_Hardware_RM.md` §5.1 and the
 antenna controller manual `proxmark3/doc/md/PM5_Controllers/PM5_ANT_Controller_RM.md`
 (I2C slave `0x51`).
 
-#### Physical pin layout (PM5) — UNVERIFIED
+#### Physical pin layout (PM5) — confirmed
 
-> **The PM5 pad ordering has not been confirmed against a physical board.** The
-> only raw observation on record is: *viewed from the underside, each band's pads
-> read `GND`, `RAW`, `DRV` left-to-right.* Converting that to a top-down
-> left/right statement requires a mirror flip, and the flip direction has been a
-> source of error in this document — so it is **not** asserted here as fact.
->
-> Each PM5 connector carries the same three signals — `GND`, `RAW`, `DRV`
-> (`DRV` = drive/`PWR`). Identify each pad by continuity/silkscreen on the actual
-> board, then wire by function per the [signal map](#signal-mapping-function-to-function).
-> Once buzzed, record the confirmed order here and drop this warning.
+Viewed from the **top**, the LF connector is on the **left** and HF on the
+**right**. Each band is mirrored about the board centre (`GND` outermost,
+`DRV` innermost). Reading left-to-right:
+
+```
+        (viewed from top)
+
+        LF                    HF
+   GND  RAW  DRV         DRV  RAW  GND
+```
+
+This layout is **confirmed** against a physical board.
 
 ## Adapter
 
@@ -152,7 +148,7 @@ flowchart LR
     RFPATH --- RSER
     RFPATH --- CSER
     RFPATH --- CTRIM
-    RFPATH -->|"signal-to-signal<br/>buzz board first"| TANK
+    RFPATH -->|"signal-to-signal<br/>(mirror + band swap)"| TANK
     CTRL_OUT -.->|"not required"| EMU
     BOOST ==>|"drive-first: sets peak V, PM5 side"| RF_OUT
 
@@ -167,10 +163,11 @@ flowchart LR
 
 ### Signal mapping (function-to-function)
 
-Wire by **function**, not by physical position. The boards' physical pad orders
-are not assumed to match (and the PM5 order is unverified — see the warning
-above), so `PWR`/`DRV`, `RAW`, and `GND` must be matched signal-to-signal after
-identifying each pad on the actual board — never straight-through by position.
+Wire by **function**, not by physical position. Both boards' orders are confirmed
+(see the pin-order table above), but they never line up physically — each board
+mirrors its two bands **and** the bands are swapped side-to-side — so `PWR`/`DRV`,
+`RAW`, and `GND` must be matched signal-to-signal per band, never
+straight-through by position.
 
 The three RF nets are **not** symmetric — each carries a different (optional,
 unpopulated-by-default) passive footprint. LF band drawn; HF is identical:
