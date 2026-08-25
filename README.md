@@ -123,7 +123,10 @@ flowchart LR
     end
 
     subgraph ADAPTER["Adapter"]
-        RFPATH["RF pass-through<br/>DRV·RAW·GND per band<br/>opt. R/C trim pads (unpopulated)"]
+        RFPATH["RF pass-through<br/>DRV·RAW·GND per band<br/>(function-to-function)"]
+        RSER["Series-R on DRV<br/>(opt, damping/Q)"]
+        CSER["Series-C on RAW<br/>(opt, sense trim)"]
+        CTRIM["Shunt-C DRV→GND<br/>(opt, re-tune f0)"]
         EMU["pm5_antx emulator (OPTIONAL)<br/>I2C slave 0x51<br/>ID + ACK-and-mirror<br/>2 blue LEDs (opt.)"]
     end
 
@@ -132,13 +135,21 @@ flowchart LR
     end
 
     RF_OUT -->|"drive / sense / gnd"| RFPATH
+    RFPATH --- RSER
+    RFPATH --- CSER
+    RFPATH --- CTRIM
     RFPATH -->|"function-to-function<br/>mind the mirror"| TANK
     CTRL_OUT -.->|"optional"| EMU
-    BOOST -.->|"sets peak V, PM5 side"| RF_OUT
+    BOOST ==>|"drive-first: sets peak V, PM5 side"| RF_OUT
 
     classDef opt stroke-dasharray:4 4;
-    class EMU opt;
+    class EMU,RSER,CSER,CTRIM opt;
 ```
+
+> **Matching is drive-first.** The passive footprints above are unpopulated by
+> default — the primary way to match the RDV4 tank to the PM5 is the PM5's
+> adjustable BOOST drive voltage, not a series/shunt network. See
+> [Matching strategy](#matching-strategy--drive-first-passives-as-fallback).
 
 ### Signal mapping (function-to-function)
 
@@ -146,29 +157,53 @@ Wire by **function**, not by physical position — the boards' pin orders differ
 (see the pin-order note above), so `PWR`/`DRV`, `RAW`, and `GND` must be matched
 across, not straight-through.
 
+The three RF nets are **not** symmetric — each carries a different (optional,
+unpopulated-by-default) passive footprint. LF band drawn; HF is identical:
+
 ```mermaid
 flowchart LR
-    subgraph HF["HF band"]
+    subgraph LF["LF band (HF identical)"]
         direction LR
-        P_HDRV["PM5 DRV"] ---|"drive"| R_HDRV["RDV4 PWR"]
-        P_HRAW["PM5 RAW"] ---|"sense"| R_HRAW["RDV4 RAW"]
-        P_HGND["PM5 GND"] ---|"gnd"| R_HGND["RDV4 GND"]
-    end
-
-    subgraph LF["LF band"]
-        direction LR
-        P_LDRV["PM5 DRV"] ---|"drive"| R_LDRV["RDV4 PWR"]
-        P_LRAW["PM5 RAW"] ---|"sense"| R_LRAW["RDV4 RAW"]
-        P_LGND["PM5 GND"] ---|"gnd"| R_LGND["RDV4 GND"]
+        P_DRV["PM5 DRV"] --- RS["R series<br/>(opt, damping/Q)"] --- R_DRV["RDV4 PWR"]
+        P_RAW["PM5 RAW"] --- CS["C series<br/>(opt, sense trim)"] --- R_RAW["RDV4 RAW"]
+        P_GND["PM5 GND"] --- R_GND["RDV4 GND"]
+        RS -.-|"shunt"| CT["C trim<br/>(opt, re-tune f0)"]
+        CT -.- P_GND
     end
 
     classDef drv fill:#FAECE7,stroke:#993C1D,color:#4A1B0C;
     classDef raw fill:#E1F5EE,stroke:#0F6E56,color:#04342C;
     classDef gnd fill:#F1EFE8,stroke:#5F5E5A,color:#2C2C2A;
-    class P_HDRV,R_HDRV,P_LDRV,R_LDRV drv;
-    class P_HRAW,R_HRAW,P_LRAW,R_LRAW raw;
-    class P_HGND,R_HGND,P_LGND,R_LGND gnd;
+    classDef opt fill:#FAEEDA,stroke:#854F0B,color:#412402,stroke-dasharray:4 4;
+    class P_DRV,R_DRV drv;
+    class P_RAW,R_RAW raw;
+    class P_GND,R_GND gnd;
+    class RS,CS,CT opt;
 ```
+
+#### Matching strategy — drive-first, passives-as-fallback
+
+Do **not** reach for a matching network first. The RDV4 tank already resonates
+near ~124 kHz and its own R2 (8.2 Ω) sets its damping/Q; the PM5 uses the same
+`DRV`/`RAW`/`GND` architecture, so f₀ should stay put when plugged in. The
+measured LF ring difference (RDV4 ~37 V vs PM5 ~24 V) is a **drive** difference,
+not a Q difference — and drive is corrected on the PM5 side via its adjustable
+**BOOST** voltage (FPGA `PWMOUT` / `PDP_EN`), which is strictly better than
+burning signal in a series resistor.
+
+So: **populate nothing by default; match via the PM5 drive-voltage knob, and
+only fall back to passives if drive adjustment can't get you there.**
+
+| Footprint         | Net       | Populate only to…                                    |
+| ----------------- | --------- | ---------------------------------------------------- |
+| Series-R          | DRV       | **reduce** Q if PM5 overdrives a too-high-Q tank — costs field |
+| Trim-C (shunt)    | DRV → GND | re-land f₀ if measured resonance shifts off-band on PM5 |
+| Series-C          | RAW       | fix sense loading if PM5's sense input misbehaves — likely never |
+| —                 | GND       | nothing; straight through                            |
+
+> The series-R is a **de-tuning** tool (adds damping), not a signal booster —
+> adding it *lowers* the field. If the PM5 tank is under-driven, turn up the
+> BOOST drive voltage instead.
 
 ## Reference measurements — Proxmark3 RDV4 default antenna
 
