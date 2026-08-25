@@ -73,7 +73,9 @@ export const Icx301 = (props: {
 			[PIN_RAW]: "RAW",
 		}}
 		footprint={
-			<footprint>
+			// Right-angle SMT connector: the plug mates from the front (+Y) face,
+			// so the part must sit on a board edge with +Y pointing off-board.
+			<footprint insertionDirection="from_top">
 				{/* Left power blade */}
 				<smtpad
 					portHints={[PIN_PWR]}
