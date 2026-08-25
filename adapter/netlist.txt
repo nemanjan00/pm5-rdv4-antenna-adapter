@@ -1,0 +1,90 @@
+COMPONENTS:
+ - RDV4: 
+ - J_LF: ICX301PT-FGY
+ - R_LF_DRV: 0Ω resistor
+ - C_LF_RAW: 1nF capacitor
+ - C_LF_TRIM: 1nF capacitor
+ - J_HF: ICX301PT-FGY
+ - R_HF_DRV: 0Ω resistor
+ - C_HF_RAW: 1nF capacitor
+ - C_HF_TRIM: 1nF capacitor
+
+NET: RDV4_LF_RAW
+  - C_LF_RAW pin2 (-)
+  - C_LF_RAW pin1 (+)
+  - J_LF RAW
+  - RDV4 LF_RAW
+
+NET: RDV4_LF_PWR
+  - C_LF_TRIM pin1 (+)
+  - R_LF_DRV pin2
+  - R_LF_DRV pin1
+  - J_LF PWR
+  - RDV4 LF_PWR
+
+NET: RDV4_LF_GND
+  - C_LF_TRIM pin2 (-)
+  - J_LF GND
+  - RDV4 LF_GND
+
+NET: RDV4_HF_RAW
+  - C_HF_RAW pin2 (-)
+  - C_HF_RAW pin1 (+)
+  - J_HF RAW
+  - RDV4 HF_RAW
+
+NET: RDV4_HF_PWR
+  - C_HF_TRIM pin1 (+)
+  - R_HF_DRV pin2
+  - R_HF_DRV pin1
+  - J_HF PWR
+  - RDV4 HF_PWR
+
+NET: RDV4_HF_GND
+  - C_HF_TRIM pin2 (-)
+  - J_HF GND
+  - RDV4 HF_GND
+
+
+COMPONENT_PINS:
+RDV4
+- pin1(LF_GND): NETS(RDV4_LF_GND)
+- pin2(LF_RAW): NETS(RDV4_LF_RAW)
+- pin3(LF_PWR): NETS(RDV4_LF_PWR)
+- pin4(HF_PWR): NETS(RDV4_HF_PWR)
+- pin5(HF_RAW): NETS(RDV4_HF_RAW)
+- pin6(HF_GND): NETS(RDV4_HF_GND)
+
+J_LF (ICX301PT-FGY)
+- pin1(PWR): NETS(RDV4_LF_PWR)
+- pin2(GND): NETS(RDV4_LF_GND)
+- pin3(RAW): NETS(RDV4_LF_RAW)
+
+R_LF_DRV (0Ω undefined)
+- pin1(anode, pos, left): NETS(RDV4_LF_PWR)
+- pin2(cathode, neg, right): NETS(RDV4_LF_PWR)
+
+C_LF_RAW (1nF undefined)
+- pin1(anode, pos, left): NETS(RDV4_LF_RAW)
+- pin2(cathode, neg, right): NETS(RDV4_LF_RAW)
+
+C_LF_TRIM (1nF undefined)
+- pin1(anode, pos, left): NETS(RDV4_LF_PWR)
+- pin2(cathode, neg, right): NETS(RDV4_LF_GND)
+
+J_HF (ICX301PT-FGY)
+- pin1(PWR): NETS(RDV4_HF_PWR)
+- pin2(GND): NETS(RDV4_HF_GND)
+- pin3(RAW): NETS(RDV4_HF_RAW)
+
+R_HF_DRV (0Ω undefined)
+- pin1(anode, pos, left): NETS(RDV4_HF_PWR)
+- pin2(cathode, neg, right): NETS(RDV4_HF_PWR)
+
+C_HF_RAW (1nF undefined)
+- pin1(anode, pos, left): NETS(RDV4_HF_RAW)
+- pin2(cathode, neg, right): NETS(RDV4_HF_RAW)
+
+C_HF_TRIM (1nF undefined)
+- pin1(anode, pos, left): NETS(RDV4_HF_PWR)
+- pin2(cathode, neg, right): NETS(RDV4_HF_GND)

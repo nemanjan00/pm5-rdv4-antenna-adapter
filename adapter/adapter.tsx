@@ -43,8 +43,12 @@ const RDV4_X = -(BOARD_W / 2) + 3; // mm, RDV4 column ~3 mm from left edge  TODO
 const CONN_PITCH = 22.1; // mm, LF↔HF connector centre pitch  [PM5 drawing]
 const CONN_X = BOARD_W / 2 - 4; // mm, right edge
 const CONN_ROTATION = 270; // deg, so the +Y mating face points +X (off-board)
-const LF_Y = CONN_PITCH / 2; // ≈ +11 (upper)
-const HF_Y = -CONN_PITCH / 2; // ≈ -11 (lower)
+// The adapter plugs into the PM5 flipped, so the connectors are MIRRORED
+// relative to the RDV4 column (which has the LF trio on top, HF on bottom): the
+// LF connector sits LOW and the HF connector HIGH. The per-band traces then
+// cross over each other to reach their RDV4 trios — the intended crossover.
+const LF_CONN_Y = -CONN_PITCH / 2; // ≈ -11 (lower)  — mates PM5 LF
+const HF_CONN_Y = CONN_PITCH / 2; // ≈ +11 (upper)  — mates PM5 HF
 // Trim passives sit mid-board (x offsets: R_DRV, C_RAW, C_TRIM), per-band Y.
 const PASSIVE_X = [-6, -2, 2];
 
@@ -145,8 +149,8 @@ export const Adapter = () => (
 		    mounting holes needed). */}
 		<Rdv4Interface name={RDV4} pcbX={RDV4_X} pcbY={0} schX={8} schY={0} />
 
-		<Band band="LF" connY={LF_Y} passiveY={7} />
-		<Band band="HF" connY={HF_Y} passiveY={-7} />
+		<Band band="LF" connY={LF_CONN_Y} passiveY={7} />
+		<Band band="HF" connY={HF_CONN_Y} passiveY={-7} />
 	</board>
 );
 
