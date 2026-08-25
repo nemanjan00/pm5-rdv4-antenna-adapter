@@ -19,10 +19,14 @@ one for the HF antenna and one for the LF antenna — each with the same signals
 On the RDV4 the pins are labelled `GND` / `LF_RAW` / `LF_PWR` (and the `HF_*`
 equivalents); on the PM5 silkscreen the drive pin is labelled `DRV`.
 
-> **Note — pin order differs between boards.** Top-down, the PM5 runs both bands
-> in the same direction (`DRV` → `RAW` → `GND`). The RDV4 does **not** match this
-> on both bands, so do not assume the RDV4 order matches the PM5 when wiring an
-> adapter.
+> **⚠️ Wire by function, and buzz the PM5 board before trusting any spatial
+> order.** The two boards use the same three signals (`GND` / `RAW` / `PWR`≡`DRV`)
+> but their physical pad ordering is **not** assumed to match. The RDV4 order
+> below is observed; the **PM5 spatial order is UNVERIFIED** — earlier top/bottom
+> viewpoint flips in this document's history make any left-right claim suspect
+> until confirmed with a continuity check on the actual board. Match
+> **signal-to-signal** (`DRV`→`PWR`, `RAW`→`RAW`, `GND`→`GND`); never wire
+> straight-through by position.
 
 On the RDV4, viewed **top-down**, the **left** antenna connection is **HF** and
 the **right** is **LF**. Reading left-to-right:
@@ -32,8 +36,8 @@ the **right** is **LF**. Reading left-to-right:
 | HF (left)  | `GND` → `RAW` → `PWR`   |
 | LF (right) | `PWR` → `RAW` → `GND`   |
 
-So the two RDV4 bands are mirrored, and the LF order is reversed relative to the
-PM5's `GND` → `RAW` → `DRV`.
+So the two RDV4 bands are mirrored relative to each other. (This is the RDV4's
+own layout; it makes no claim about the PM5 — see the warning above.)
 
 ### RDV4 antenna interface
 
@@ -64,17 +68,22 @@ and the antenna carries the **female** connector that those pins mate into.
 #### Extra connector on the PM5 antenna
 
 Unlike the RDV4 antenna, the PM5 antenna also carries a **10-pin (2x5) 2.54 mm**
-header, with the **male pins on the antenna** side. Viewed from the top, it sits
-on the **far left** side, beyond the ICX301 connectors (LF left, HF right).
+header, with the **male pins on the antenna** side. It sits to one side of the
+ICX301 connectors, past both bands. (The exact left/right side depends on
+viewing orientation — see the unverified-layout warning above; confirm against
+the board.)
 
 This mates with the PM5 **main board 10P Connect header** — a general-purpose
 breakout, not antenna-specific. On the shipped antenna the antenna controller
 uses the **I2C SDA/SCL** lines (system I2C bus) to talk to the host; the rest of
 the pins are unused by the antenna.
 
-**Pinout** (per the proxmark3 docs — orientation: directly viewing the 10P
-connector with the machine's decorative side facing up, ICX301 connectors on the
-right):
+**Pinout** — reproduced **verbatim from the proxmark3 docs** in their own stated
+orientation: *directly viewing the 10P connector with the machine's decorative
+side facing up, ICX301 connectors on the right.* This is a **different reference
+frame** from the top-down antenna convention used elsewhere in this document, and
+the two have **not** been reconciled — do not assume this row order maps onto the
+"LF left / HF right" framing above without checking the board.
 
 ```
  UART_TX   UART_RX   I2C_SDA   SWDIO   SWCLK
@@ -95,24 +104,29 @@ Source: `proxmark3/doc/md/Development/PM5_VERE_Hardware_RM.md` §5.1 and the
 antenna controller manual `proxmark3/doc/md/PM5_Controllers/PM5_ANT_Controller_RM.md`
 (I2C slave `0x51`).
 
-#### Physical pin layout (PM5)
+#### Physical pin layout (PM5) — UNVERIFIED
 
-Viewed from the **top** of the board, the LF connector is on the **left** and the
-HF connector is on the **right**. On both connectors the pins read `DRV`, `RAW`,
-`GND` from left to right:
-
-```
-        (viewed from top)
-
-        LF                    HF
-   DRV  RAW  GND         DRV  RAW  GND
-```
+> **The PM5 pad ordering has not been confirmed against a physical board.** The
+> only raw observation on record is: *viewed from the underside, each band's pads
+> read `GND`, `RAW`, `DRV` left-to-right.* Converting that to a top-down
+> left/right statement requires a mirror flip, and the flip direction has been a
+> source of error in this document — so it is **not** asserted here as fact.
+>
+> Each PM5 connector carries the same three signals — `GND`, `RAW`, `DRV`
+> (`DRV` = drive/`PWR`). Identify each pad by continuity/silkscreen on the actual
+> board, then wire by function per the [signal map](#signal-mapping-function-to-function).
+> Once buzzed, record the confirmed order here and drop this warning.
 
 ## Adapter
 
 The adapter connects a PM5 mainboard to an RDV4 (dumb/passive) antenna. The RF
-path is a straight pass-through per band; the PM5's antenna-controller I2C bus is
-optional and can be emulated so the PM5 sees a valid antenna controller.
+path is a straight pass-through per band.
+
+> **I2C / antenna controller is NOT required** (confirmed by DXL). The PM5 drives
+> a passive antenna fine without any antenna controller on the bus — the adapter
+> needs only the RF path. The `pm5_antx` emulator below is therefore **entirely
+> optional**, useful only if you want the on-antenna niceties (blue LED
+> indication, multi-frequency LF selection); the RF path works without it.
 
 ```mermaid
 flowchart LR
@@ -127,7 +141,7 @@ flowchart LR
         RSER["Series-R on DRV<br/>(opt, damping/Q)"]
         CSER["Series-C on RAW<br/>(opt, sense trim)"]
         CTRIM["Shunt-C DRV→GND<br/>(opt, re-tune f0)"]
-        EMU["pm5_antx emulator (OPTIONAL)<br/>I2C slave 0x51<br/>ID + ACK-and-mirror<br/>2 blue LEDs (opt.)"]
+        EMU["pm5_antx emulator (NOT REQUIRED)<br/>I2C slave 0x51<br/>only for LED / multi-freq extras<br/>PM5 runs the antenna without it"]
     end
 
     subgraph RDV4["RDV4 antenna — dumb / passive"]
@@ -138,8 +152,8 @@ flowchart LR
     RFPATH --- RSER
     RFPATH --- CSER
     RFPATH --- CTRIM
-    RFPATH -->|"function-to-function<br/>mind the mirror"| TANK
-    CTRL_OUT -.->|"optional"| EMU
+    RFPATH -->|"signal-to-signal<br/>buzz board first"| TANK
+    CTRL_OUT -.->|"not required"| EMU
     BOOST ==>|"drive-first: sets peak V, PM5 side"| RF_OUT
 
     classDef opt stroke-dasharray:4 4;
@@ -153,9 +167,10 @@ flowchart LR
 
 ### Signal mapping (function-to-function)
 
-Wire by **function**, not by physical position — the boards' pin orders differ
-(see the pin-order note above), so `PWR`/`DRV`, `RAW`, and `GND` must be matched
-across, not straight-through.
+Wire by **function**, not by physical position. The boards' physical pad orders
+are not assumed to match (and the PM5 order is unverified — see the warning
+above), so `PWR`/`DRV`, `RAW`, and `GND` must be matched signal-to-signal after
+identifying each pad on the actual board — never straight-through by position.
 
 The three RF nets are **not** symmetric — each carries a different (optional,
 unpopulated-by-default) passive footprint. LF band drawn; HF is identical:
@@ -185,11 +200,15 @@ flowchart LR
 
 Do **not** reach for a matching network first. The RDV4 tank already resonates
 near ~124 kHz and its own R2 (8.2 Ω) sets its damping/Q; the PM5 uses the same
-`DRV`/`RAW`/`GND` architecture, so f₀ should stay put when plugged in. The
-measured LF ring difference (RDV4 ~37 V vs PM5 ~24 V) is a **drive** difference,
-not a Q difference — and drive is corrected on the PM5 side via its adjustable
-**BOOST** voltage (FPGA `PWMOUT` / `PDP_EN`), which is strictly better than
-burning signal in a series resistor.
+`DRV`/`RAW`/`GND` architecture, so f₀ should stay put when plugged in. Peak field
+is set on the PM5 side by its adjustable **BOOST** drive voltage — an active,
+firmware-side knob that is strictly better than burning signal in a series
+resistor. So correct field/drive there first.
+
+> The reference measurements below are **not** a before/after adapter comparison:
+> they are two independent baselines of *different* antennas (RDV4 antenna on
+> RDV4 board; PM5 antenna on PM5 board), taken in separate `hw tune` runs. Do not
+> read the raw-voltage gap between them as an adapter drive delta.
 
 So: **populate nothing by default; match via the PM5 drive-voltage knob, and
 only fall back to passives if drive adjustment can't get you there.**
@@ -205,6 +224,13 @@ only fall back to passives if drive adjustment can't get you there.**
 > adding it *lowers* the field. If the PM5 tank is under-driven, turn up the
 > BOOST drive voltage instead.
 
+> **Trim-C placement footgun.** The diagram draws the shunt trim-C from `DRV` to
+> `GND` for convenience, but that node is the *driven* side — the RDV4 tank's own
+> C3 already sits across L2, and a cap on the driven node may load the driver more
+> than it retunes the tank. When you actually need to trim f₀, the more
+> predictable spot is across the **resonant node (RAW–GND)**. Pick the pad
+> accordingly once you're populating it.
+
 ## Reference measurements — Proxmark3 RDV4 default antenna
 
 Output of `hw tune` on a Proxmark3 RDV4 with the stock/default antenna, used
@@ -213,22 +239,28 @@ antenna**.
 
 ### LF Antenna (RDV4)
 
-| Measurement            | Value     |
-| ---------------------- | --------- |
-| 125.00 kHz             | 36.84 V   |
-| 134.83 kHz             | 25.92 V   |
-| 123.71 kHz (optimal)   | 36.88 V   |
-| Frequency bandwidth    | 5.7       |
-| Peak voltage           | 6.4       |
-| LF antenna             | ok        |
+| Measurement                 | Value     |
+| --------------------------- | --------- |
+| 125.00 kHz (field)          | 36.84 V   |
+| 134.83 kHz (field)          | 25.92 V   |
+| 123.71 kHz optimal (field)  | 36.88 V   |
+| Frequency bandwidth         | 5.7       |
+| Approx. Q factor (derived)  | ≈22 (f₀/BW = 123.71/5.7) |
+| Peak voltage¹               | 6.4       |
+| LF antenna                  | ok        |
+
+¹ *"Peak voltage" is the Q-estimator's internal figure, **not** a field voltage
+in volts. The field readings are the "(field)" rows above (e.g. 36.88 V).*
 
 ### HF Antenna (RDV4)
 
 | Measurement            | Value     |
 | ---------------------- | --------- |
-| 13.56 MHz              | 48.46 V   |
-| Peak voltage           | 8.5       |
+| 13.56 MHz (field)      | 48.46 V   |
+| Peak voltage¹          | 8.5       |
 | HF antenna             | ok        |
+
+¹ Q-estimator figure, not field volts (see LF note).
 
 ### LF tuning graph (RDV4)
 
@@ -240,24 +272,36 @@ antenna**.
 Output of `hw tune` on a PM5 with the stock/default antenna. Q factor must be
 measured **without a tag on the antenna**.
 
+> **Provenance / conditions.** Firmware, and USB-vs-battery power state at capture
+> time are **not recorded** — treat these as an uncalibrated baseline until
+> re-captured under known conditions. This is a *different antenna* from the RDV4
+> baseline, taken in a separate run; the two are not directly comparable (see the
+> matching-strategy note). An earlier PM5 capture also raised a `hw tune` warning
+> that turned out to be a **firmware bug**, not a hardware issue.
+
 ### LF Antenna (PM5)
 
-| Measurement            | Value     |
-| ---------------------- | --------- |
-| 125.00 kHz             | 23.83 V   |
-| 134.83 kHz             | 18.30 V   |
-| 121.21 kHz (optimal)   | 24.15 V   |
-| Frequency bandwidth    | 3.9       |
-| Peak voltage           | 7.0       |
-| LF antenna             | ok        |
+| Measurement                 | Value     |
+| --------------------------- | --------- |
+| 125.00 kHz (field)          | 23.83 V   |
+| 134.83 kHz (field)          | 18.30 V   |
+| 121.21 kHz optimal (field)  | 24.15 V   |
+| Frequency bandwidth         | 3.9       |
+| Approx. Q factor (derived)  | ≈31 (f₀/BW = 121.21/3.9) |
+| Peak voltage¹               | 7.0       |
+| LF antenna                  | ok        |
+
+¹ Q-estimator figure, not field volts (see RDV4 LF note).
 
 ### HF Antenna (PM5)
 
 | Measurement            | Value     |
 | ---------------------- | --------- |
-| 13.56 MHz              | 41.78 V   |
-| Peak voltage           | 12.1      |
+| 13.56 MHz (field)      | 41.78 V   |
+| Peak voltage¹          | 12.1      |
 | HF antenna             | ok        |
+
+¹ Q-estimator figure, not field volts.
 
 ### LF tuning graph (PM5)
 
