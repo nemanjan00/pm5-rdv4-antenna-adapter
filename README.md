@@ -2,8 +2,8 @@
 
 ## Antenna interface
 
-Both the Proxmark3 RDV4 and the PM5 expose a **3-pin antenna interface** per
-band (LF and HF), with the same signals:
+Both the Proxmark3 RDV4 and the PM5 expose **two 3-pin antenna connectors** —
+one for the HF antenna and one for the LF antenna — each with the same signals:
 
 | Pin       | Description         |
 | --------- | ------------------- |
@@ -11,7 +11,7 @@ band (LF and HF), with the same signals:
 | RAW       | Raw antenna signal  |
 | PWR (DRV) | Drive / power       |
 
-On the RDV4 the pins are labelled `GND` / `LF_RAW` / `LF_PWR` (and the HF
+On the RDV4 the pins are labelled `GND` / `LF_RAW` / `LF_PWR` (and the `HF_*`
 equivalents); on the PM5 silkscreen the drive pin is labelled `DRV`.
 
 - RDV4 interface: `images/rdv4-antenna-interface.webp`
