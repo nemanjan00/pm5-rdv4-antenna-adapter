@@ -19,6 +19,9 @@ equivalents); on the PM5 silkscreen the drive pin is labelled `DRV`.
 > LF is `GND` / `LF_RAW` / `LF_PWR` while HF is `HF_PWR` / `HF_RAW` / `GND`. Do
 > not assume the RDV4 order matches the PM5 when wiring an adapter.
 
+On the RDV4, viewed **top-down**, the **left** antenna connection is **HF** and
+the **right** is **LF**.
+
 ### RDV4 antenna interface
 
 ![RDV4 antenna interface](images/rdv4-antenna-interface.webp)
