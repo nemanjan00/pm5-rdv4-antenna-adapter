@@ -13,30 +13,29 @@
  *   HF_RAW         │  HF trio
  *   GND     (HF)  ─┘
  *
- * Each pad is a ROUND contact pad with a central hole holding a press-fit
- * THREADED PCB INSERT (M1.6). An M1.6 screw passes through the antenna pad and
- * this pad into the insert; the screw clamps the antenna pad against this pad →
- * that clamp is the electrical contact. So the hole must be sized for the
- * insert's knurled press-fit OD (bigger than the 1.6 mm thread), and the insert
- * body sits on the back — leave keep-out on the reverse.
+ * Each pad is a round SMD land carrying an M1.6 **SMT nut** (e.g. PEM ReelFast
+ * SMTSO-M1.6-1ET), reflow- or hand-soldered on. The screw passes through the
+ * antenna pad and threads into this nut, clamping the antenna pad down → that
+ * clamp (and the soldered nut) is the electrical contact. So the footprint is
+ * the nut's solder land + a centre screw-clearance hole; the nut body sits on
+ * this side — leave keep-out around it.
  *
  * The center connector is unused electrically but its body still occupies space,
  * so the adapter must leave clearance there.
  *
- * ⚠️ Geometry read off the dimensioned drawing; CONFIRM against hardware.
+ * ⚠️ Geometry read off the dimensioned drawing; CONFIRM against hardware, and
+ * pull the exact land/clearance from the SMT-nut datasheet.
  */
 
 // ── Mechanical constants (from images/rdv4-antenna-physical.webp) ──────────
 // TODO: confirm every value against the physical RDV4 antenna.
-// M1.6 press-fit threaded PCB insert: the hole takes the insert's knurled OD
-// (> 1.6 mm thread), and the insert body protrudes on the back — reserve
-// ~5 mm back-side keep-out per pad.
-// TODO: pick the exact insert (e.g. an M1.6 press-fit / SMT standoff) and set
-// the hole to its datasheet press-fit Ø; model the reverse-side keep-out.
-// NB: PAD_OUTER_D must stay < the smallest pad pitch (4.4 mm) or the round pads
-// overlap. TODO: confirm the real insert knurl Ø and pad Ø from datasheets.
-const INSERT_PRESSFIT_D = 2.5; // mm, HOLE sized for M1.6 insert knurl OD   TODO
-const PAD_OUTER_D = 3.5; // mm, round contact-pad OD (< 4.4 mm pitch)       TODO
+// M1.6 SMT nut (PEM SMTSO-M1.6-1ET or equivalent): round solder land + a centre
+// clearance hole for the screw. The nut body protrudes on this side — reserve
+// keep-out around it. NB: NUT_LAND_D must stay < the smallest pad pitch (4.4 mm)
+// or the round lands overlap.
+// TODO: set NUT_LAND_D and SCREW_CLEARANCE_D from the SMT-nut datasheet land.
+const NUT_LAND_D = 3.2; // mm, round SMD land for the nut barrel (< 4.4 pitch) TODO
+const SCREW_CLEARANCE_D = 1.8; // mm, centre hole for the M1.6 screw          TODO
 
 // Vertical pad-to-pad spacings, top → bottom (mm). TODO: confirm.
 const GAP_GND_LFRAW = 5.0; // GND → LF_RAW
@@ -105,17 +104,17 @@ export const Rdv4Interface = (props: {
 			}, {} as Record<string, string>)}
 			footprint={
 				<footprint>
-					{/* Round contact pad + hole for the M1.6 press-fit threaded
-					    insert. The screw clamp through it is the electrical
-					    contact. */}
+					{/* SMT-nut land: annular ring (nut solders to it) + centre
+					    screw-clearance hole. Modelled as an annular plated hole to
+					    avoid the pad/hole overlap DRC a separate smtpad+hole hits. */}
 					{PADS.map((pad, index) => (
 						<platedhole
 							key={pad.port}
 							portHints={[String(index + 1)]}
 							pcbX={baseX}
 							pcbY={yOf(pad.down)}
-							holeDiameter={INSERT_PRESSFIT_D}
-							outerDiameter={PAD_OUTER_D}
+							holeDiameter={SCREW_CLEARANCE_D}
+							outerDiameter={NUT_LAND_D}
 							shape="circle"
 						/>
 					))}

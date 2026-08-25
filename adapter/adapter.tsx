@@ -8,7 +8,7 @@
  *   │      (left)            (right)  │
  *   │   …function-to-function RF…     │  optional trim pads (DNP)
  *   └────────────────────────────────┘
- *   RDV4 side = one vertical column of 6 round M1.6 press-fit-insert pads
+ *   RDV4 side = one vertical column of 6 round M1.6 SMT-nut lands
  *   (LF trio top, HF trio bottom); the antenna screws/clamps onto them.
  *
  * Wiring is FUNCTION-TO-FUNCTION per band (never straight-through by position,
@@ -83,7 +83,7 @@ const Band = (props: { band: string; jx: number; jy: number }) => {
 export const Adapter = () => (
 	<board width={BOARD_W} height={BOARD_H}>
 		{/* RDV4 antenna interface — single vertical pad column; the six M1.6
-		    press-fit-insert pads also mechanically mount the antenna (no separate
+		    SMT-nut lands also mechanically mount the antenna (no separate
 		    mounting holes needed). */}
 		<Rdv4Interface name={RDV4} pcbX={RDV4_X} pcbY={0} />
 
