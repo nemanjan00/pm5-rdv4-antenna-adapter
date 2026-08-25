@@ -51,18 +51,17 @@ Physical interface with dimensions:
 The RDV4 antenna has a physical control for the **LF tank only** — there is none
 for HF (the HF tank is fixed):
 
-- **Q factor** — high/low damping (observed Q ≈ **14** or **7**), LF only. This is
-  a **physical toggle switch** on the RDV4 antenna (confirmed on hardware). Note
-  the proxmark3 docs call it a "physical button" (`PM5_VERE_Hardware_RM.md` §8.1),
-  but on the actual board it is a toggle switch; the PM5 replaced it with I2C
-  switching regardless.
+The RDV4 antenna has **two physical toggle switches** (both confirmed on
+hardware):
 
-> **LF frequency selection — conflicts with the docs.** An earlier note here said
-> the RDV4 has a 125/134 kHz *frequency* switch. The proxmark3 docs don't mention
-> one and list **multi-frequency LF (125/134/250/375/500 kHz) as a PM5-only new
-> feature** (§8.1) — implying the RDV4 LF tank is single-tuned (~124 kHz) and
-> 134 kHz is just measured off-resonance. **Verify against the physical RDV4
-> antenna** before trusting a frequency switch.
+- **Q factor** — high/low damping (observed Q ≈ **14** or **7**).
+- **LF frequency** — selects **125 kHz** or **134 kHz**.
+
+> The proxmark3 docs are incomplete here: they call the Q control a "physical
+> button" and list multi-frequency LF as a PM5-only new feature
+> (`PM5_VERE_Hardware_RM.md` §8.1), implying no RDV4 frequency switch. The actual
+> RDV4 antenna has **both** as toggle switches — hardware observation wins. (The
+> PM5 replaced both with I2C control and added the 250/375/500 kHz steps.)
 
 > ⚠️ These switch Q figures (14/7) don't line up with the `hw tune`-derived
 > **Q≈22** in the [RDV4 LF measurements](#lf-antenna-rdv4). The switch position
