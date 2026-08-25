@@ -2,10 +2,10 @@
 
 ## Antenna interface
 
-> **Viewpoint convention:** unless stated otherwise, all **RDV4** orientations
-> in this document are as seen **from the top**, and all **PM5** orientations are
-> as seen **from the bottom**. (The one exception is the PM5 10P header pinout
-> below, which keeps the orientation stated in the proxmark3 docs.)
+> **Viewpoint convention:** unless stated otherwise, all orientations in this
+> document — both **RDV4** and **PM5** — are as seen **from the top**. (The one
+> exception is the PM5 10P header pinout below, which keeps the orientation
+> stated in the proxmark3 docs.)
 
 Both the Proxmark3 RDV4 and the PM5 expose **two 3-pin antenna connectors** —
 one for the HF antenna and one for the LF antenna — each with the same signals:
@@ -19,9 +19,10 @@ one for the HF antenna and one for the LF antenna — each with the same signals
 On the RDV4 the pins are labelled `GND` / `LF_RAW` / `LF_PWR` (and the `HF_*`
 equivalents); on the PM5 silkscreen the drive pin is labelled `DRV`.
 
-> **Note — pin order differs between boards.** On the PM5 both bands run in the
-> same direction (`GND` → `RAW` → `DRV`). The RDV4 does **not** match this, so do
-> not assume the RDV4 order matches the PM5 when wiring an adapter.
+> **Note — pin order differs between boards.** Top-down, the PM5 runs both bands
+> in the same direction (`DRV` → `RAW` → `GND`). The RDV4 does **not** match this
+> on both bands, so do not assume the RDV4 order matches the PM5 when wiring an
+> adapter.
 
 On the RDV4, viewed **top-down**, the **left** antenna connection is **HF** and
 the **right** is **LF**. Reading left-to-right:
@@ -63,8 +64,8 @@ and the antenna carries the **female** connector that those pins mate into.
 #### Extra connector on the PM5 antenna
 
 Unlike the RDV4 antenna, the PM5 antenna also carries a **10-pin (2x5) 2.54 mm**
-header, with the **male pins on the antenna** side. Viewed from below, it sits on
-the **far right** side, beyond the ICX301 connectors (HF left, LF right).
+header, with the **male pins on the antenna** side. Viewed from the top, it sits
+on the **far left** side, beyond the ICX301 connectors (LF left, HF right).
 
 This mates with the PM5 **main board 10P Connect header** — a general-purpose
 breakout, not antenna-specific. On the shipped antenna the antenna controller
@@ -96,15 +97,15 @@ antenna controller manual `proxmark3/doc/md/PM5_Controllers/PM5_ANT_Controller_R
 
 #### Physical pin layout (PM5)
 
-Viewed from **below** the board, the HF connector is on the **left** and the LF
-connector is on the **right**. On both connectors the pins read `GND`, `RAW`,
-`DRV` from left to right:
+Viewed from the **top** of the board, the LF connector is on the **left** and the
+HF connector is on the **right**. On both connectors the pins read `DRV`, `RAW`,
+`GND` from left to right:
 
 ```
-        (viewed from below)
+        (viewed from top)
 
-        HF                    LF
-   GND  RAW  DRV         GND  RAW  DRV
+        LF                    HF
+   DRV  RAW  GND         DRV  RAW  GND
 ```
 
 ## Reference measurements — Proxmark3 RDV4 default antenna
