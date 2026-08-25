@@ -38,6 +38,10 @@ PM5's `GND` → `RAW` → `DRV`.
 
 ![RDV4 antenna interface](images/rdv4-antenna-interface.webp)
 
+Physical interface with dimensions:
+
+![RDV4 physical antenna interface](images/rdv4-antenna-physical.webp)
+
 ### PM5 (ICX301) antenna interface
 
 ![PM5 ICX301 antenna interface](images/icx301-interface.webp)
