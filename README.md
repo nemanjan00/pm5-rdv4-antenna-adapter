@@ -2,6 +2,11 @@
 
 ## Antenna interface
 
+> **Viewpoint convention:** unless stated otherwise, all **RDV4** orientations
+> in this document are as seen **from the top**, and all **PM5** orientations are
+> as seen **from the bottom**. (The one exception is the PM5 10P header pinout
+> below, which keeps the orientation stated in the proxmark3 docs.)
+
 Both the Proxmark3 RDV4 and the PM5 expose **two 3-pin antenna connectors** —
 one for the HF antenna and one for the LF antenna — each with the same signals:
 
