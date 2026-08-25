@@ -32,6 +32,20 @@ The PM5 uses ICX301 connectors:
 The PM5 board carries the **male** connector — it has the actual center pins —
 and the antenna carries the **female** connector that those pins mate into.
 
+#### Physical pin layout (PM5)
+
+Viewed from **below** the board, the HF connector is on the **left** and the LF
+connector is on the **right**. Each connector's pins run left-to-right in the
+same order:
+
+```
+        (viewed from below)
+
+        HF                    LF
+   GND  RAW  DRV         GND  RAW  DRV
+   left ------> right    left ------> right
+```
+
 ## Reference measurements — Proxmark3 RDV4 default antenna
 
 Output of `hw tune` on a Proxmark3 RDV4 with the stock/default antenna, used
