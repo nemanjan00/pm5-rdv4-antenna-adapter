@@ -293,6 +293,24 @@ only fall back to passives if drive adjustment can't get you there.**
 > predictable spot is across the **resonant node (RAW–GND)**. Pick the pad
 > accordingly once you're populating it.
 
+## Board (tscircuit)
+
+The board is built with [tscircuit](https://tscircuit.com) in `adapter/`
+(`yarn build`). These renders are the current **skeleton** — net topology and
+placement are in place but **mechanical geometry is stubbed** (ICX301 pad
+dimensions and RDV4 spacings are placeholders pending datasheets), so treat them
+as structural previews, not fabrication-ready.
+
+**PCB** — RDV4 SMT-nut pad column on the left edge, center-connector keep-out,
+DNP trim passives, and the two ICX301 connectors on the right:
+
+![Adapter PCB (skeleton)](images/adapter-pcb.png)
+
+**Schematic** — function-to-function wiring per band, with the DNP trim parts
+(`R_*_DRV`, `C_*_RAW`, `C_*_TRIM`) connected in parallel with the direct nets:
+
+![Adapter schematic (skeleton)](images/adapter-schematic.png)
+
 ## PCB / layout guidance
 
 **No controlled/matched-impedance PCB is needed** at these frequencies. The
