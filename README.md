@@ -42,6 +42,10 @@ Physical interface with dimensions:
 
 ![RDV4 physical antenna interface](images/rdv4-antenna-physical.webp)
 
+> The **center connector** (LF_IN, PWR_HI, PWR_OE1, VMID, 5V, USB, etc.) is
+> **not used for the antenna** — only the six outer pads (LF: `GND`/`RAW`/`PWR`,
+> HF: `PWR`/`RAW`/`GND`) form the antenna interface.
+
 ### PM5 (ICX301) antenna interface
 
 ![PM5 ICX301 antenna interface](images/icx301-interface.webp)
