@@ -97,15 +97,14 @@ antenna controller manual `proxmark3/doc/md/PM5_Controllers/PM5_ANT_Controller_R
 #### Physical pin layout (PM5)
 
 Viewed from **below** the board, the HF connector is on the **left** and the LF
-connector is on the **right**. Each connector's pins run left-to-right in the
-same order:
+connector is on the **right**. On both connectors the pins read `GND`, `RAW`,
+`DRV` from left to right:
 
 ```
         (viewed from below)
 
         HF                    LF
    GND  RAW  DRV         GND  RAW  DRV
-   left ------> right    left ------> right
 ```
 
 ## Reference measurements — Proxmark3 RDV4 default antenna
