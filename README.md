@@ -14,8 +14,13 @@ one for the HF antenna and one for the LF antenna — each with the same signals
 On the RDV4 the pins are labelled `GND` / `LF_RAW` / `LF_PWR` (and the `HF_*`
 equivalents); on the PM5 silkscreen the drive pin is labelled `DRV`.
 
-- RDV4 interface: `images/rdv4-antenna-interface.webp`
-- PM5 (ICX301) interface: `images/icx301-interface.webp`
+### RDV4 antenna interface
+
+![RDV4 antenna interface](images/rdv4-antenna-interface.webp)
+
+### PM5 (ICX301) antenna interface
+
+![PM5 ICX301 antenna interface](images/icx301-interface.webp)
 
 ## Reference measurements — Proxmark3 RDV4 default antenna
 
