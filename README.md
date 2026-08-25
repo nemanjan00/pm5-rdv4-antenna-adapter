@@ -48,11 +48,19 @@ Physical interface with dimensions:
 > **not used for the antenna** — only the six outer pads (LF: `GND`/`RAW`/`PWR`,
 > HF: `PWR`/`RAW`/`GND`) form the antenna interface.
 
-The RDV4 antenna's on-board physical switches affect the **LF tank only** — there
-is no switch for HF (the HF tank is fixed):
+The RDV4 antenna has a physical control for the **LF tank only** — there is none
+for HF (the HF tank is fixed):
 
-- **Q factor switch** — selects Q ≈ **14** or **7** (high/low damping), LF only.
-- **LF frequency switch** — selects **125 kHz** or **134 kHz**.
+- **Q factor** — high/low damping (observed Q ≈ **14** or **7**), LF only. The
+  proxmark3 docs describe this as a *physical button* on the RDV4, which the PM5
+  replaced with I2C switching (`PM5_VERE_Hardware_RM.md` §8.1).
+
+> **LF frequency selection — conflicts with the docs.** An earlier note here said
+> the RDV4 has a 125/134 kHz *frequency* switch. The proxmark3 docs don't mention
+> one and list **multi-frequency LF (125/134/250/375/500 kHz) as a PM5-only new
+> feature** (§8.1) — implying the RDV4 LF tank is single-tuned (~124 kHz) and
+> 134 kHz is just measured off-resonance. **Verify against the physical RDV4
+> antenna** before trusting a frequency switch.
 
 > ⚠️ These switch Q figures (14/7) don't line up with the `hw tune`-derived
 > **Q≈22** in the [RDV4 LF measurements](#lf-antenna-rdv4). The switch position
@@ -83,9 +91,19 @@ register `0x02` selects frequency and Q:
 | 1   | LF LED          | 1 = on                                            |
 | 0   | Q value         | 1 = high Q / 0 = low Q — high Q only at 125/134 kHz |
 
-So the PM5 antenna adds **more LF frequencies** (125/134/250/375/500 kHz) and
-two blue LEDs beyond what the RDV4's two physical switches offer. Power-on
-default is 125 kHz + low Q + LEDs off (`0x02` = `0x80`).
+So the PM5 antenna adds **more LF frequencies** (125/134/250/375/500 kHz, the
+250/375/500 being new) and two blue LEDs beyond the RDV4. Power-on default is
+125 kHz + low Q + LEDs off (`0x02` = `0x80`).
+
+From the client, this register is driven by:
+
+```
+hw ant_pm5 -m --set <8bit data>
+```
+
+> ⚠️ **High Q is only allowed at 125/134 kHz** — the controller forces low Q at
+> any other frequency to prevent excessive resonant voltage from damaging the
+> device (`PM5_ANT_Controller_RM.md` §6; `Proxmark5-Instructions.md`).
 
 > This applies to the **PM5's own** antenna. An **RDV4** antenna on a PM5 has no
 > controller — you get whatever its physical Q/frequency switches are set to, and
