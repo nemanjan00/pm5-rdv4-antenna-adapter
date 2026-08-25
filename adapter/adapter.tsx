@@ -37,6 +37,10 @@ const RDV4_X = -(BOARD_W / 2) + 3; // mm, RDV4 column ~3 mm from left edge  TODO
 const CONN_X = 6; // mm, PM5-side ICX301 connectors (inboard)  TODO
 const LF_Y = 9; // mm, LF connector Y (aligns w/ upper RDV4 trio)  TODO
 const HF_Y = -9; // mm, HF connector Y (aligns w/ lower RDV4 trio)  TODO
+// PM5 mating geometry (proxmark3/doc/img/pm5/icx301-and-10p-header.jpg): the two
+// ICX301 connectors are SIDE-BY-SIDE, LF-DRV↔HF-DRV = 16 mm → centre pitch
+// 16 + 6.1 = ~22.1 mm. To plug into the PM5 both connectors must sit at that
+// pitch and orientation. TODO: real mating layout replaces the stub stack below.
 
 // Single RDV4 interface component; refdes reused by every band's traces.
 const RDV4 = "RDV4";

@@ -124,6 +124,15 @@ The PM5 uses ICX301 connectors:
 The PM5 board carries the **male** connector — it has the actual center pins —
 and the antenna carries the **female** connector that those pins mate into.
 
+**Datasheet / drawing (in the proxmark3 submodule):**
+- `proxmark3/doc/datasheets/AMASS_ICX301PT_SPEC.pdf` — ICX301PT-M/F dims:
+  body 11.10 mm wide, blade pitch **6.10 mm**, pad span 9.70 mm, female depth
+  4.90 mm. 15 A / 500 V, brass gold-plated, PCB SMT. These are the numbers the
+  `adapter/icx301.tsx` footprint is built from.
+- `proxmark3/doc/img/pm5/icx301-and-10p-header.jpg` — official PM5 drawing that
+  confirms the pin order (LF `GND RAW DRV` / HF `DRV RAW GND`, RAW = the small
+  centre signal pin) and the inter-connector spacing (LF-DRV↔HF-DRV = 16 mm).
+
 #### Extra connector on the PM5 antenna
 
 Unlike the RDV4 antenna, the PM5 antenna also carries a **10-pin (2x5) 2.54 mm**

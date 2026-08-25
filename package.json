@@ -5,7 +5,8 @@
 	"description": "tscircuit PCB adapter: PM5 mainboard <-> RDV4 (passive) antenna",
 	"scripts": {
 		"dev": "tsci dev adapter/adapter.tsx",
-		"build": "tsci build adapter/adapter.tsx"
+		"build": "tsci build adapter/adapter.tsx",
+		"render": "tsci build adapter/adapter.tsx --pcb-png --schematic-png && cp dist/adapter/adapter/pcb.png images/adapter-pcb.png && cp dist/adapter/adapter/schematic.png images/adapter-schematic.png"
 	},
 	"dependencies": {
 		"react": "^19.2.8",
