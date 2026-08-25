@@ -4,8 +4,8 @@
  *   PM5 mainboard (ICX301 male)
  *        │  plugs into
  *   ┌────────────────────────────────┐
- *   │ ICX301-F x2 (LF/HF)   RDV4 col  │
- *   │      (left)            (right)  │
+ *   │ RDV4 col    ICX301-F x2 (LF/HF) │
+ *   │ (left edge)      (inboard)      │
  *   │   …function-to-function RF…     │  optional trim pads (DNP)
  *   └────────────────────────────────┘
  *   RDV4 side = one vertical column of 6 round M1.6 SMT-nut lands
@@ -31,8 +31,10 @@ import { Rdv4Interface } from "./rdv4-pads";
 // TODO: real layout once ICX301PT-FGY + RDV4 mechanicals are confirmed.
 const BOARD_W = 42; // mm  TODO
 const BOARD_H = 45; // mm  TODO
-const RDV4_X = 13; // mm, RDV4 pad column (right side)  TODO
-const CONN_X = -12; // mm, PM5-side ICX301 connectors (left side)  TODO
+// RDV4 pad column sits on the board EDGE (like the antenna's own drawing) so the
+// antenna lines up flush; ICX301 connectors sit inboard of it.
+const RDV4_X = -(BOARD_W / 2) + 3; // mm, RDV4 column ~3 mm from left edge  TODO
+const CONN_X = 6; // mm, PM5-side ICX301 connectors (inboard)  TODO
 const LF_Y = 9; // mm, LF connector Y (aligns w/ upper RDV4 trio)  TODO
 const HF_Y = -9; // mm, HF connector Y (aligns w/ lower RDV4 trio)  TODO
 
@@ -52,10 +54,9 @@ const Band = (props: { band: string; jx: number; jy: number }) => {
 	const j = "J_" + props.band; // PM5-side ICX301
 	const p = props.band; // RDV4 port prefix (LF_* / HF_*)
 
-	// TODO: verify tscircuit trace-selector syntax (".Ref > .Port").
 	return (
 		<>
-			<Icx301 name={j} pcbX={props.jx} pcbY={props.jy} />
+			<Icx301 name={j} pcbX={props.jx} pcbY={props.jy} schX={-6} schY={props.jy} />
 
 			{/* Function-to-function RF path — primary, always connected.
 			    This is the whole adapter electrically. */}
@@ -63,19 +64,59 @@ const Band = (props: { band: string; jx: number; jy: number }) => {
 			<trace from={"." + j + " > .RAW"} to={"." + RDV4 + " > ." + p + "_RAW"} />
 			<trace from={"." + j + " > .GND"} to={"." + RDV4 + " > ." + p + "_GND"} />
 
-			{/* Optional trim footprints — DO NOT PLACE, and left UNCONNECTED on
-			    purpose. They are fallback lands only (drive-first via PM5 BOOST is
-			    the primary matching path — see README). To actually use one, cut
-			    the relevant direct trace above and bridge through the footprint:
+			{/* Optional trim footprints — DO NOT PLACE, but CONNECTED in the
+			    schematic at their intended positions (each sits in parallel with
+			    the direct trace above, so the RF path works unpopulated; to insert
+			    one, cut the direct trace and populate the part):
 			      R_*_DRV  → series-R in the DRV path (damping/Q)
 			      C_*_RAW  → series-C in the RAW/sense path
-			      C_*_TRIM → shunt-C for f0 re-tune
+			      C_*_TRIM → shunt-C, DRV→GND (f0 re-tune)
 			    TODO: relocate C_*_TRIM to the RAW-GND (resonant) node — see the
-			    README "Trim-C placement footgun" note.
-			    TODO: confirm tscircuit `doNotPlace` prop name/behaviour. */}
-			<resistor name={"R_" + p + "_DRV"} resistance="0" footprint="0805" doNotPlace />
-			<capacitor name={"C_" + p + "_RAW"} capacitance="0" footprint="0805" doNotPlace />
-			<capacitor name={"C_" + p + "_TRIM"} capacitance="0" footprint="0805" doNotPlace />
+			    README "Trim-C placement footgun" note. */}
+			<resistor
+				name={"R_" + p + "_DRV"}
+				resistance="0"
+				footprint="0805"
+				doNotPlace
+				pcbX={-13}
+				pcbY={props.jy}
+				schX={0}
+				schY={props.jy}
+				connections={{
+					pin1: "." + j + " > .PWR",
+					pin2: "." + RDV4 + " > ." + p + "_PWR",
+				}}
+			/>
+			<capacitor
+				name={"C_" + p + "_RAW"}
+				capacitance="1nF"
+				footprint="0805"
+				doNotPlace
+				schOrientation="vertical"
+				pcbX={-9}
+				pcbY={props.jy}
+				schX={0}
+				schY={props.jy - 1.5}
+				connections={{
+					pin1: "." + j + " > .RAW",
+					pin2: "." + RDV4 + " > ." + p + "_RAW",
+				}}
+			/>
+			<capacitor
+				name={"C_" + p + "_TRIM"}
+				capacitance="1nF"
+				footprint="0805"
+				doNotPlace
+				schOrientation="vertical"
+				pcbX={-5}
+				pcbY={props.jy}
+				schX={2}
+				schY={props.jy - 3}
+				connections={{
+					pin1: "." + j + " > .PWR",
+					pin2: "." + j + " > .GND",
+				}}
+			/>
 		</>
 	);
 };
@@ -85,7 +126,7 @@ export const Adapter = () => (
 		{/* RDV4 antenna interface — single vertical pad column; the six M1.6
 		    SMT-nut lands also mechanically mount the antenna (no separate
 		    mounting holes needed). */}
-		<Rdv4Interface name={RDV4} pcbX={RDV4_X} pcbY={0} />
+		<Rdv4Interface name={RDV4} pcbX={RDV4_X} pcbY={0} schX={8} schY={0} />
 
 		<Band band="LF" jx={CONN_X} jy={LF_Y} />
 		<Band band="HF" jx={CONN_X} jy={HF_Y} />

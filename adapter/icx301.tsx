@@ -47,12 +47,16 @@ export const Icx301 = (props: {
 	pcbX?: number;
 	pcbY?: number;
 	pcbRotation?: number;
+	schX?: number;
+	schY?: number;
 }) => (
 	<chip
 		name={props.name}
 		pcbX={props.pcbX}
 		pcbY={props.pcbY}
 		pcbRotation={props.pcbRotation}
+		schX={props.schX}
+		schY={props.schY}
 		manufacturerPartNumber="ICX301PT-FGY"
 		pinLabels={{
 			[PIN_PWR]: "PWR",
@@ -88,12 +92,13 @@ export const Icx301 = (props: {
 					height={SIGNAL_PAD_H}
 					shape="rect"
 				/>
-				{/* Body courtyard / silkscreen outline */}
-				<silkscreenrect
+				{/* Body courtyard (IPC) */}
+				<courtyardrect
 					pcbX={0}
 					pcbY={0}
 					width={COURTYARD_W}
 					height={COURTYARD_H}
+					strokeWidth={0.1}
 				/>
 			</footprint>
 		}

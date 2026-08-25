@@ -89,15 +89,20 @@ export const Rdv4Interface = (props: {
 	name: string;
 	pcbX?: number;
 	pcbY?: number;
+	schX?: number;
+	schY?: number;
 }) => {
-	const baseX = props.pcbX ?? 0;
-	const baseY = props.pcbY ?? 0;
-	// pcbY increases upward, so map "down" offsets to negative Y, centred.
-	const yOf = (down: number) => baseY + COLUMN_HEIGHT / 2 - down;
+	// Footprint coords are RELATIVE to the component origin; the chip's pcbX/pcbY
+	// place the whole column. pcbY increases upward, so map "down" to -Y, centred.
+	const yOf = (down: number) => COLUMN_HEIGHT / 2 - down;
 
 	return (
 		<chip
 			name={props.name}
+			pcbX={props.pcbX}
+			pcbY={props.pcbY}
+			schX={props.schX}
+			schY={props.schY}
 			pinLabels={PADS.reduce((labels, pad, index) => {
 				labels[String(index + 1)] = pad.port;
 				return labels;
@@ -111,7 +116,7 @@ export const Rdv4Interface = (props: {
 						<platedhole
 							key={pad.port}
 							portHints={[String(index + 1)]}
-							pcbX={baseX}
+							pcbX={0}
 							pcbY={yOf(pad.down)}
 							holeDiameter={SCREW_CLEARANCE_D}
 							outerDiameter={NUT_LAND_D}
@@ -119,11 +124,21 @@ export const Rdv4Interface = (props: {
 						/>
 					))}
 					{/* Center connector — unused for antenna; keep-out for its body. */}
+					{/* Marked as silkscreen (installed core lacks <pcbkeepout>).
+					    TODO: switch to <pcbkeepout> when core supports it. */}
 					<silkscreenrect
-						pcbX={baseX}
+						pcbX={0}
 						pcbY={yOf(CENTER_KEEPOUT_DOWN)}
 						width={CENTER_KEEPOUT_W}
 						height={CENTER_KEEPOUT_H}
+					/>
+					{/* Whole-interface courtyard so the component has one. */}
+					<courtyardrect
+						pcbX={0}
+						pcbY={0}
+						width={NUT_LAND_D + 2}
+						height={COLUMN_HEIGHT + 3}
+						strokeWidth={0.1}
 					/>
 				</footprint>
 			}
