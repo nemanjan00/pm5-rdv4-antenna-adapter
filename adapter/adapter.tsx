@@ -3,11 +3,13 @@
  *
  *   PM5 mainboard (ICX301 male)
  *        │  plugs into
- *   ┌──────────────────────┐
- *   │  ICX301-F  x2 (LF/HF) │  ← PM5 side (this board's connectors)
- *   │        …RF path…      │  ← function-to-function, optional trim pads (DNP)
- *   │  RDV4 pads x2 + M1.6  │  ← RDV4 antenna solders/bolts on
- *   └──────────────────────┘
+ *   ┌────────────────────────────────┐
+ *   │ ICX301-F x2 (LF/HF)   RDV4 col  │
+ *   │      (left)            (right)  │
+ *   │   …function-to-function RF…     │  optional trim pads (DNP)
+ *   └────────────────────────────────┘
+ *   RDV4 side = one vertical column of 6 round M1.6 press-fit-insert pads
+ *   (LF trio top, HF trio bottom); the antenna screws/clamps onto them.
  *
  * Wiring is FUNCTION-TO-FUNCTION per band (never straight-through by position,
  * because the two boards mirror + band-swap — see README):
@@ -23,40 +25,43 @@
  */
 
 import { Icx301 } from "./icx301";
-import { Rdv4Pads } from "./rdv4-pads";
+import { Rdv4Interface } from "./rdv4-pads";
 
 // ── Board / placement stubs ───────────────────────────────────────────────
 // TODO: real layout once ICX301PT-FGY + RDV4 mechanicals are confirmed.
-const BOARD_W = 40; // mm  TODO
-const BOARD_H = 30; // mm  TODO
-const BAND_DX = 12; // mm, LF/HF horizontal separation  TODO
-const CONN_Y = -8; // mm, PM5-side connector row  TODO
-const PADS_Y = 8; // mm, RDV4-side pad row  TODO
-const HOLE_DIAMETER = "1.7mm"; // M1.6 clearance  TODO
+const BOARD_W = 42; // mm  TODO
+const BOARD_H = 45; // mm  TODO
+const RDV4_X = 13; // mm, RDV4 pad column (right side)  TODO
+const CONN_X = -12; // mm, PM5-side ICX301 connectors (left side)  TODO
+const LF_Y = 9; // mm, LF connector Y (aligns w/ upper RDV4 trio)  TODO
+const HF_Y = -9; // mm, HF connector Y (aligns w/ lower RDV4 trio)  TODO
+
+// Single RDV4 interface component; refdes reused by every band's traces.
+const RDV4 = "RDV4";
 
 /**
- * One band's worth of the adapter: PM5 connector, RDV4 pads, the three optional
- * trim footprints, and the function-to-function traces between them.
+ * One band's traces + optional trim footprints. The PM5 connector is placed by
+ * the caller; here we wire it function-to-function to the shared RDV4 interface.
  *
  * @param {object} props
- * @param {string} props.band - "LF" or "HF" (used for refdes + placement)
- * @param {number} props.x    - band centre X on the board (mm)
+ * @param {string} props.band - "LF" or "HF" (used for refdes + RDV4 port prefix)
+ * @param {number} props.jx   - PM5 connector X (mm)
+ * @param {number} props.jy   - PM5 connector Y (mm)
  */
-const Band = (props: { band: string; x: number }) => {
+const Band = (props: { band: string; jx: number; jy: number }) => {
 	const j = "J_" + props.band; // PM5-side ICX301
-	const rd = "RDV4_" + props.band; // RDV4-side pads
+	const p = props.band; // RDV4 port prefix (LF_* / HF_*)
 
 	// TODO: verify tscircuit trace-selector syntax (".Ref > .Port").
 	return (
 		<>
-			<Icx301 name={j} pcbX={props.x} pcbY={CONN_Y} />
-			<Rdv4Pads name={rd} pcbX={props.x} pcbY={PADS_Y} />
+			<Icx301 name={j} pcbX={props.jx} pcbY={props.jy} />
 
 			{/* Function-to-function RF path — primary, always connected.
 			    This is the whole adapter electrically. */}
-			<trace from={"." + j + " > .PWR"} to={"." + rd + " > .PWR"} />
-			<trace from={"." + j + " > .RAW"} to={"." + rd + " > .RAW"} />
-			<trace from={"." + j + " > .GND"} to={"." + rd + " > .GND"} />
+			<trace from={"." + j + " > .PWR"} to={"." + RDV4 + " > ." + p + "_PWR"} />
+			<trace from={"." + j + " > .RAW"} to={"." + RDV4 + " > ." + p + "_RAW"} />
+			<trace from={"." + j + " > .GND"} to={"." + RDV4 + " > ." + p + "_GND"} />
 
 			{/* Optional trim footprints — DO NOT PLACE, and left UNCONNECTED on
 			    purpose. They are fallback lands only (drive-first via PM5 BOOST is
@@ -68,22 +73,22 @@ const Band = (props: { band: string; x: number }) => {
 			    TODO: relocate C_*_TRIM to the RAW-GND (resonant) node — see the
 			    README "Trim-C placement footgun" note.
 			    TODO: confirm tscircuit `doNotPlace` prop name/behaviour. */}
-			<resistor name={"R_" + props.band + "_DRV"} resistance="0" footprint="0805" doNotPlace />
-			<capacitor name={"C_" + props.band + "_RAW"} capacitance="0" footprint="0805" doNotPlace />
-			<capacitor name={"C_" + props.band + "_TRIM"} capacitance="0" footprint="0805" doNotPlace />
+			<resistor name={"R_" + p + "_DRV"} resistance="0" footprint="0805" doNotPlace />
+			<capacitor name={"C_" + p + "_RAW"} capacitance="0" footprint="0805" doNotPlace />
+			<capacitor name={"C_" + p + "_TRIM"} capacitance="0" footprint="0805" doNotPlace />
 		</>
 	);
 };
 
 export const Adapter = () => (
 	<board width={BOARD_W} height={BOARD_H}>
-		<Band band="LF" x={-BAND_DX} />
-		<Band band="HF" x={BAND_DX} />
+		{/* RDV4 antenna interface — single vertical pad column; the six M1.6
+		    press-fit-insert pads also mechanically mount the antenna (no separate
+		    mounting holes needed). */}
+		<Rdv4Interface name={RDV4} pcbX={RDV4_X} pcbY={0} />
 
-		{/* M1.6 mounting holes (RDV4 antenna bolts on). Placed clear of the pad
-		    rows for now. TODO: real positions from the RDV4 mechanical. */}
-		<hole diameter={HOLE_DIAMETER} pcbX={-BOARD_W / 2 + 2} pcbY={0} />
-		<hole diameter={HOLE_DIAMETER} pcbX={BOARD_W / 2 - 2} pcbY={0} />
+		<Band band="LF" jx={CONN_X} jy={LF_Y} />
+		<Band band="HF" jx={CONN_X} jy={HF_Y} />
 	</board>
 );
 
