@@ -38,6 +38,34 @@ Unlike the RDV4 antenna, the PM5 antenna also carries a **10-pin (2x5) 2.54 mm**
 header, with the **male pins on the antenna** side. Viewed from below, it sits on
 the **far right** side, beyond the ICX301 connectors (HF left, LF right).
 
+This mates with the PM5 **main board 10P Connect header** — a general-purpose
+breakout, not antenna-specific. On the shipped antenna the antenna controller
+uses the **I2C SDA/SCL** lines (system I2C bus) to talk to the host; the rest of
+the pins are unused by the antenna.
+
+**Pinout** (per the proxmark3 docs — orientation: directly viewing the 10P
+connector with the machine's decorative side facing up, ICX301 connectors on the
+right):
+
+```
+ UART_TX   UART_RX   I2C_SDA   SWDIO   SWCLK
+ MCU_RST  DBG_PWR_ON  VCC5V4   I2C_SCL   GND
+```
+
+| Signal        | MCU pin        | Notes                                                  |
+| ------------- | -------------- | ------------------------------------------------------ |
+| UART_TX / RX  | `PA2` / `PA3`  | UART or GPIO; 3.3 V                                     |
+| I2C_SDA / SCL | `PC7` / `PC6`  | System I2C bus — antenna controller talks here; 3.3 V  |
+| SWDIO / SWCLK | `PA13` / `PA14`| SWD debug / flash; 3.3 V                                |
+| MCU_RST       | MCU RESET      | 3.3 V pull-up; pull low to reset MCU                   |
+| DBG_PWR_ON    | —              | Debug power-on (2.0–15 V high); overrides power switch |
+| VCC5V4        | —              | ~5.4 V DCDC output only (<300 mA); do not feed power in|
+| GND           | —              | Ground                                                 |
+
+Source: `proxmark3/doc/md/Development/PM5_VERE_Hardware_RM.md` §5.1 and the
+antenna controller manual `proxmark3/doc/md/PM5_Controllers/PM5_ANT_Controller_RM.md`
+(I2C slave `0x51`).
+
 #### Physical pin layout (PM5)
 
 Viewed from **below** the board, the HF connector is on the **left** and the LF
