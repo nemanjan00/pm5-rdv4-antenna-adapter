@@ -32,6 +32,11 @@ The PM5 uses ICX301 connectors:
 The PM5 board carries the **male** connector — it has the actual center pins —
 and the antenna carries the **female** connector that those pins mate into.
 
+#### Extra connector on the PM5 antenna
+
+Unlike the RDV4 antenna, the PM5 antenna also carries a **10-pin (2x5) 2.54 mm**
+header, with the **male pins on the antenna** side.
+
 #### Physical pin layout (PM5)
 
 Viewed from **below** the board, the HF connector is on the **left** and the LF
