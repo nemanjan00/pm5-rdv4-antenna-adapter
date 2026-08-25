@@ -53,6 +53,12 @@ The RDV4 antenna has two on-board physical switches for the LF tank:
 - **Q factor switch** — selects Q ≈ **14** or **7** (high/low damping).
 - **LF frequency switch** — selects **125 kHz** or **134 kHz**.
 
+> ⚠️ These switch Q figures (14/7) don't line up with the `hw tune`-derived
+> **Q≈22** in the [RDV4 LF measurements](#lf-antenna-rdv4). The switch position
+> during that capture wasn't recorded, and the `hw tune` f₀/BW estimate and the
+> antenna's nominal Q labels may simply be defined differently. Treat both as
+> unreconciled until a capture is taken with a known switch position.
+
 These are set on the antenna itself. When driving an RDV4 antenna from a PM5,
 tuning/Q is chosen **here, on the antenna** — the PM5 has no way to change them
 in software, because there is no antenna controller in this path.
@@ -157,8 +163,9 @@ path is a straight pass-through per band.
 > **I2C / antenna controller is NOT required** (confirmed by DXL). The PM5 drives
 > a passive antenna fine without any antenna controller on the bus — the adapter
 > needs only the RF path. The `pm5_antx` emulator below is therefore **entirely
-> optional**, useful only if you want the on-antenna niceties (blue LED
-> indication, multi-frequency LF selection); the RF path works without it.
+> optional**: it only answers the controller's I2C ID/registers (and can drive
+> LEDs if fitted) — it **cannot** retune a passive RDV4 tank, so it adds no real
+> frequency/Q control. The RF path works without it.
 
 ```mermaid
 flowchart LR
