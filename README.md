@@ -273,6 +273,42 @@ only fall back to passives if drive adjustment can't get you there.**
 > predictable spot is across the **resonant node (RAW–GND)**. Pick the pad
 > accordingly once you're populating it.
 
+## PCB / layout guidance
+
+**No controlled/matched-impedance PCB is needed** at these frequencies. The
+adapter is electrically tiny — you are in the lumped-element regime, not the
+transmission-line regime.
+
+Transmission-line effects only matter once a trace is a meaningful fraction of a
+wavelength (rule of thumb: length > λ/10):
+
+| Signal      | λ (free space) | λ on FR4 (VF≈0.5) | λ/10 on board | Adapter trace |
+| ----------- | -------------- | ----------------- | ------------- | ------------- |
+| 13.56 MHz   | ~22.1 m        | ~11 m             | ~1.1 m        | ~cm           |
+| 125/134 kHz | ~2400 m        | ~1200 m           | ~120 m        | ~cm           |
+
+The traces are ~2–3 orders of magnitude shorter than even the strictest
+threshold (at 13.56 MHz a few cm is ~0.3% of a wavelength — the trace is just a
+wire). Also, the PM3 antenna path **is not a 50 Ω system**: it is an FPGA driving
+a resonant LC tank, so "matching" here means **LC resonance tuning** (the
+trim-C / series-R footprints above), not transmission-line impedance.
+
+What actually matters is lumped parasitics, not trace geometry:
+
+1. **Keep stray capacitance low and consistent.** Any capacitance the adapter
+   adds to the `RAW`/`DRV` nets sits in parallel with the tank and shifts f₀
+   (this is why the trim-C footprints exist). Short traces, small loop area, no
+   unnecessary copper pour under the RAW node.
+2. **Fat, low-resistance `DRV` traces.** The LF high-Q tank can pull significant
+   drive current; size the drive copper for IR drop and heating. This is a
+   DC/thermal concern, not an RF one.
+3. **Low connector contact resistance.** ICX301 and the RDV4 pads add series R in
+   the tank loop, which directly costs Q. Solid, low-resistance mating matters
+   more than any trace tuning.
+
+So: standard 2-layer FR4, short fat drive traces, minimal added stray C. No
+impedance control, no length tuning, no reference-plane discipline required.
+
 ## Reference measurements — Proxmark3 RDV4 default antenna
 
 Output of `hw tune` on a Proxmark3 RDV4 with the stock/default antenna, used
