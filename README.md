@@ -243,7 +243,9 @@ near ~124 kHz and its own R2 (8.2 Ω) sets its damping/Q; the PM5 uses the same
 `DRV`/`RAW`/`GND` architecture, so f₀ should stay put when plugged in. Peak field
 is set on the PM5 side by its adjustable **BOOST** drive voltage — an active,
 firmware-side knob that is strictly better than burning signal in a series
-resistor. So correct field/drive there first.
+resistor. So correct field/drive there first. (BOOST is set by the FPGA's
+`PWMOUT` (pin 38) with `PDP_EN` (pin 42) enabling it — see
+`PM5_VERE_Hardware_RM.md` §2 "Controllable antenna drive voltage".)
 
 > The reference measurements below are **not** a before/after adapter comparison:
 > they are two independent baselines of *different* antennas (RDV4 antenna on
