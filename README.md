@@ -1,5 +1,22 @@
 # PM5 RDV4 Antenna Adapter
 
+## Antenna interface
+
+Both the Proxmark3 RDV4 and the PM5 expose a **3-pin antenna interface** per
+band (LF and HF), with the same signals:
+
+| Pin       | Description         |
+| --------- | ------------------- |
+| GND       | Ground              |
+| RAW       | Raw antenna signal  |
+| PWR (DRV) | Drive / power       |
+
+On the RDV4 the pins are labelled `GND` / `LF_RAW` / `LF_PWR` (and the HF
+equivalents); on the PM5 silkscreen the drive pin is labelled `DRV`.
+
+- RDV4 interface: `images/rdv4-antenna-interface.webp`
+- PM5 (ICX301) interface: `images/icx301-interface.webp`
+
 ## Reference measurements — Proxmark3 RDV4 default antenna
 
 Output of `hw tune` on a Proxmark3 RDV4 with the stock/default antenna, used
