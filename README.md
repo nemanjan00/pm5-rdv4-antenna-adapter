@@ -131,7 +131,11 @@ and the antenna carries the **female** connector that those pins mate into.
   `adapter/icx301.tsx` footprint is built from.
 - `proxmark3/doc/img/pm5/icx301-and-10p-header.jpg` — official PM5 drawing that
   confirms the pin order (LF `GND RAW DRV` / HF `DRV RAW GND`, RAW = the small
-  centre signal pin) and the inter-connector spacing (LF-DRV↔HF-DRV = 16 mm).
+  centre signal pin) and the inter-connector spacing (LF-DRV↔HF-DRV = 16 mm):
+
+![PM5 ICX301 + 10P header — official drawing](images/pm5-icx301-and-10p-header.jpg)
+
+*Source: [RfidResearchGroup/proxmark3](https://github.com/RfidResearchGroup/proxmark3/blob/master/doc/img/pm5/icx301-and-10p-header.jpg).*
 
 #### Extra connector on the PM5 antenna
 
