@@ -1,3 +1,6 @@
 [submodule "proxmark3"]
 	path = proxmark3
 	url = https://github.com/RfidResearchGroup/proxmark3
+[submodule "tscircuit-skill"]
+	path = tscircuit-skill
+	url = https://github.com/tscircuit/skill
