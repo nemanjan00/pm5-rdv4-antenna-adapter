@@ -48,9 +48,10 @@ Physical interface with dimensions:
 > **not used for the antenna** — only the six outer pads (LF: `GND`/`RAW`/`PWR`,
 > HF: `PWR`/`RAW`/`GND`) form the antenna interface.
 
-The RDV4 antenna has two on-board physical switches for the LF tank:
+The RDV4 antenna's on-board physical switches affect the **LF tank only** — there
+is no switch for HF (the HF tank is fixed):
 
-- **Q factor switch** — selects Q ≈ **14** or **7** (high/low damping).
+- **Q factor switch** — selects Q ≈ **14** or **7** (high/low damping), LF only.
 - **LF frequency switch** — selects **125 kHz** or **134 kHz**.
 
 > ⚠️ These switch Q figures (14/7) don't line up with the `hw tune`-derived
