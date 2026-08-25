@@ -12,6 +12,11 @@ live in [README.md](./README.md). The proxmark3 source is a submodule under
 - Dev/preview: `yarn dev`.
 - `typescript` is pinned to **v5** — tscircuit's rollup plugin is incompatible
   with the TS 7 native preview. `three` is a required peer of the 3D export.
+- **Use `yarn`, not `npm`.** npm floods `ERESOLVE` peer-dependency warnings
+  because tscircuit's early (`0.0.x`) sub-packages pin mismatched `circuit-json`
+  ranges; yarn classic resolves them quietly. Do **not** `npm audit fix --force`
+  — the reported vulns are in the build-tooling tree (nothing deployed), and the
+  `--force` upgrades will break tscircuit.
 
 ## `/implement-js` skill — usage and deviation
 Per the parent `/home/nemanjan00/CLAUDE.md`, JS/TS work uses the `/implement-js`
