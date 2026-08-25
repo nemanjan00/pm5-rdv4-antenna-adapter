@@ -51,9 +51,11 @@ Physical interface with dimensions:
 The RDV4 antenna has a physical control for the **LF tank only** — there is none
 for HF (the HF tank is fixed):
 
-- **Q factor** — high/low damping (observed Q ≈ **14** or **7**), LF only. The
-  proxmark3 docs describe this as a *physical button* on the RDV4, which the PM5
-  replaced with I2C switching (`PM5_VERE_Hardware_RM.md` §8.1).
+- **Q factor** — high/low damping (observed Q ≈ **14** or **7**), LF only. This is
+  a **physical toggle switch** on the RDV4 antenna (confirmed on hardware). Note
+  the proxmark3 docs call it a "physical button" (`PM5_VERE_Hardware_RM.md` §8.1),
+  but on the actual board it is a toggle switch; the PM5 replaced it with I2C
+  switching regardless.
 
 > **LF frequency selection — conflicts with the docs.** An earlier note here said
 > the RDV4 has a 125/134 kHz *frequency* switch. The proxmark3 docs don't mention
