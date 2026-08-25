@@ -108,6 +108,68 @@ HF connector is on the **right**. On both connectors the pins read `DRV`, `RAW`,
    DRV  RAW  GND         DRV  RAW  GND
 ```
 
+## Adapter
+
+The adapter connects a PM5 mainboard to an RDV4 (dumb/passive) antenna. The RF
+path is a straight pass-through per band; the PM5's antenna-controller I2C bus is
+optional and can be emulated so the PM5 sees a valid antenna controller.
+
+```mermaid
+flowchart LR
+    subgraph PM5["PM5 mainboard — ICX301 + pads"]
+        RF_OUT["LF/HF DRV · RAW · GND"]
+        CTRL_OUT["I2C SDA/SCL · VCC · GND"]
+        BOOST["Adjustable drive voltage<br/>FPGA PWMOUT / PDP_EN"]
+    end
+
+    subgraph ADAPTER["Adapter"]
+        RFPATH["RF pass-through<br/>DRV·RAW·GND per band<br/>opt. R/C trim pads (unpopulated)"]
+        EMU["pm5_antx emulator (OPTIONAL)<br/>I2C slave 0x51<br/>ID + ACK-and-mirror<br/>2 blue LEDs (opt.)"]
+    end
+
+    subgraph RDV4["RDV4 antenna — dumb / passive"]
+        TANK["LF tank L2/C3/R2<br/>HF tank L1/C1/C2/R1<br/>own freq/Q switches"]
+    end
+
+    RF_OUT -->|"drive / sense / gnd"| RFPATH
+    RFPATH -->|"function-to-function<br/>mind the mirror"| TANK
+    CTRL_OUT -.->|"optional"| EMU
+    BOOST -.->|"sets peak V, PM5 side"| RF_OUT
+
+    classDef opt stroke-dasharray:4 4;
+    class EMU opt;
+```
+
+### Signal mapping (function-to-function)
+
+Wire by **function**, not by physical position — the boards' pin orders differ
+(see the pin-order note above), so `PWR`/`DRV`, `RAW`, and `GND` must be matched
+across, not straight-through.
+
+```mermaid
+flowchart LR
+    subgraph HF["HF band"]
+        direction LR
+        P_HDRV["PM5 DRV"] ---|"drive"| R_HDRV["RDV4 PWR"]
+        P_HRAW["PM5 RAW"] ---|"sense"| R_HRAW["RDV4 RAW"]
+        P_HGND["PM5 GND"] ---|"gnd"| R_HGND["RDV4 GND"]
+    end
+
+    subgraph LF["LF band"]
+        direction LR
+        P_LDRV["PM5 DRV"] ---|"drive"| R_LDRV["RDV4 PWR"]
+        P_LRAW["PM5 RAW"] ---|"sense"| R_LRAW["RDV4 RAW"]
+        P_LGND["PM5 GND"] ---|"gnd"| R_LGND["RDV4 GND"]
+    end
+
+    classDef drv fill:#FAECE7,stroke:#993C1D,color:#4A1B0C;
+    classDef raw fill:#E1F5EE,stroke:#0F6E56,color:#04342C;
+    classDef gnd fill:#F1EFE8,stroke:#5F5E5A,color:#2C2C2A;
+    class P_HDRV,R_HDRV,P_LDRV,R_LDRV drv;
+    class P_HRAW,R_HRAW,P_LRAW,R_LRAW raw;
+    class P_HGND,R_HGND,P_LGND,R_LGND gnd;
+```
+
 ## Reference measurements — Proxmark3 RDV4 default antenna
 
 Output of `hw tune` on a Proxmark3 RDV4 with the stock/default antenna, used
