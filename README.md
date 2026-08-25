@@ -22,6 +22,13 @@ equivalents); on the PM5 silkscreen the drive pin is labelled `DRV`.
 
 ![PM5 ICX301 antenna interface](images/icx301-interface.webp)
 
+The PM5 uses ICX301 connectors:
+
+| Part number    | Gender |
+| -------------- | ------ |
+| ICX301PT-MGY   | Male   |
+| ICX301PT-FGY   | Female |
+
 ## Reference measurements — Proxmark3 RDV4 default antenna
 
 Output of `hw tune` on a Proxmark3 RDV4 with the stock/default antenna, used
