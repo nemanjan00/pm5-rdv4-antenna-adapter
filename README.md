@@ -48,6 +48,15 @@ Physical interface with dimensions:
 > **not used for the antenna** — only the six outer pads (LF: `GND`/`RAW`/`PWR`,
 > HF: `PWR`/`RAW`/`GND`) form the antenna interface.
 
+The RDV4 antenna has two on-board physical switches for the LF tank:
+
+- **Q factor switch** — selects Q ≈ **14** or **7** (high/low damping).
+- **LF frequency switch** — selects **125 kHz** or **134 kHz**.
+
+These are set on the antenna itself (the PM5 does the equivalent over I2C on its
+own antenna — see the antenna controller manual). When driving an RDV4 antenna
+from a PM5, tuning/Q is chosen here, on the antenna, not via I2C.
+
 ### PM5 (ICX301) antenna interface
 
 ![PM5 ICX301 antenna interface](images/icx301-interface.webp)
