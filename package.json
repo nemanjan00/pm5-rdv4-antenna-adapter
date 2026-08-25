@@ -1,0 +1,18 @@
+{
+	"name": "pm5-rdv4-antenna-adapter",
+	"version": "0.1.0",
+	"private": true,
+	"description": "tscircuit PCB adapter: PM5 mainboard <-> RDV4 (passive) antenna",
+	"scripts": {
+		"dev": "tsci dev adapter/adapter.tsx",
+		"build": "tsci build adapter/adapter.tsx"
+	},
+	"dependencies": {
+		"react": "^19.2.8",
+		"tscircuit": "^0.0.2422"
+	},
+	"devDependencies": {
+		"three": "^0.185.1",
+		"typescript": "5"
+	}
+}
