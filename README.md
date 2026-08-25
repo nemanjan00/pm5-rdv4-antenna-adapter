@@ -15,12 +15,12 @@ On the RDV4 the pins are labelled `GND` / `LF_RAW` / `LF_PWR` (and the `HF_*`
 equivalents); on the PM5 silkscreen the drive pin is labelled `DRV`.
 
 > **Note — pin order differs between boards.** On the PM5 both bands run in the
-> same direction (`GND` → `RAW` → `DRV`). On the RDV4 the two bands are mirrored:
-> LF is `GND` / `LF_RAW` / `LF_PWR` while HF is `HF_PWR` / `HF_RAW` / `GND`. Do
+> same direction (`GND` → `RAW` → `DRV`). The RDV4 does **not** match this, so do
 > not assume the RDV4 order matches the PM5 when wiring an adapter.
 
 On the RDV4, viewed **top-down**, the **left** antenna connection is **HF** and
-the **right** is **LF**.
+the **right** is **LF**. Reading left-to-right, the **LF** pins are
+`PWR` → `RAW` → `GND` (i.e. reversed relative to the PM5's `GND` → `RAW` → `DRV`).
 
 ### RDV4 antenna interface
 
